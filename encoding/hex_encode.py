@@ -21,7 +21,7 @@ def hex_to_byte_lst(hex_str):
     hex_copy = list(hex_str)
     n = len(hex_copy)
 
-    if n%2 == 1:
+    if n % 2 == 1:
         hex_copy.append('0')
         n += 1
 
