@@ -16,21 +16,11 @@ if __name__ == "__main__":
     # it prints: b'myXORke'
     print(bytes.fromhex(key_0))
 
-
-    # i know 'myXORkey' part of the key, need to guess the second part
-    key_1 = ("myXORkey").encode().hex()
-
+    # i know 'myXORkey' part of the key, and the last character is 'y'. so
+    # i can guess this is the key...
+    key_1 = "myXORkeymyXORkeymyXORkeymyXORkeymyXORkeymy".encode().hex()
     ptext_1 = properties.xor_hex(ctext[0:len(key_1)], key_1)
 
-    # shows some of the plaintext corresponding to the part that is encrypted by key_1
     print(bytes.fromhex(ptext_1))
+    # crypto{1f_y0u_Kn0w_En0uGH_y0u_Kn0w_1t_4ll}
 
-
-    # this shows the last letter of the key is 'y'
-    # ptext_2 = "}".encode().hex()
-    # ctext_2 = "04"
-
-    # res = properties.xor_hex(ptext_2, ctext_2)
-    # print(bytes.fromhex(res))
-
-    
