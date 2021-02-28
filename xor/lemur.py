@@ -12,12 +12,20 @@ if __name__ == "__main__":
     with open(flag, 'rb') as g:
         t = g.read()
 
-    key = properties.xor_hex(s.hex(), t.hex())
+    len_first = 0
+    while(s[len_first] == t[len_first]):
+        len_first = len_first + 1
 
-    data = bytes.fromhex(key)
-    print(data)
+    png_bytes = s[:len_first]
 
-    with open('key.png', 'wb') as f:
-        f.write(data)
+    key = properties.xor_hex(s[len_first:].hex(), t[len_first:].hex())
+    key = png_bytes + bytes.fromhex(key)
+
+    print(key.hex())
+
+    with open('key2.png', 'wb') as f:
+        # for whatever reason, this does not seem to write all the bytes, the png comes out black after a certain point.
+        # So I just used an online tool to XOR the images and got the flag crypto{x0Rly_n0t!} or something like that
+        f.write(key)
 
 
