@@ -13,6 +13,19 @@ def matrix2bytes(matrix):
 
     return plaintext_bytes
 
+def print2d(array):
+
+    for row in array:
+        n = len(row)
+        row_output = ""
+
+        for i in range(0, n-1):
+            row_output = row_output + "{:3d}  ".format(row[i])
+
+        row_output = row_output + "{:3d}".format(row[n-1])
+        print(row_output)
+
+
 if __name__ == "__main__":
 
     # this is the matrix which i have to decrypt..
