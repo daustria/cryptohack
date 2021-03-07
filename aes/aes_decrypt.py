@@ -1,3 +1,7 @@
+from matrix import *
+from sbox import *
+from diffusion import *
+
 N_ROUNDS = 10
 
 key        = b'\xc3,\\\xa6\xb5\x80^\x0c\xdb\x8d\xa5z*\xb6\xfe\\'
@@ -51,21 +55,39 @@ def expand_key(master_key):
     return [key_columns[4*i : 4*(i+1)] for i in range(len(key_columns) // 4)]
 
 
+
+def _aes_xor_round_key(key, state):
+    for i in range(0, 4):
+        for j in range(0, 4):
+            state[i][j] ^= key[i][j]
+
 def decrypt(key, ciphertext):
     round_keys = expand_key(key) # Remember to start from the last round key and work backwards through them when decrypting
 
     # Convert ciphertext to state matrix
+    state = bytes2matrix(ciphertext)
 
     # Initial add round key step
+    _aes_xor_round_key(round_keys[N_ROUNDS], state)
 
     for i in range(N_ROUNDS - 1, 0, -1):
-        pass # Do round
+        # the aes rounds are performed in reverse order
+        inv_shift_rows(state)
+        sub_bytes(state, inv_s_box)
+        _aes_xor_round_key(round_keys[i], state)
+        inv_mix_columns(state)
 
     # Run final round (skips the InvMixColumns step)
 
+    inv_shift_rows(state)
+    sub_bytes(state, inv_s_box)
+    _aes_xor_round_key(round_keys[0], state)
+
     # Convert state matrix to plaintext
 
+    plaintext = matrix2bytes(state) 
     return plaintext
 
-
-# print(decrypt(key, ciphertext))
+if __name__ == "__main__":
+    # crypto{MYAES128}
+    print(decrypt(key, ciphertext))

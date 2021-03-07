@@ -50,11 +50,10 @@ def sub_bytes(s, sbox=s_box):
     for row in s:
         for i in range(0, 4):
             row[i] = sbox[row[i]]
-    return s
 
 if __name__ == "__main__":
 
-    state = sub_bytes(state, sbox=inv_s_box)
+    sub_bytes(state, sbox=inv_s_box)
     msg = matrix.matrix2bytes(state)
 
     # crypto{l1n34rly}
