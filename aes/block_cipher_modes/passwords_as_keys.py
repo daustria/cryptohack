@@ -26,15 +26,7 @@ def decrypt_offline(ciphertext, password_hash):
 
 if __name__ == '__main__':
 
-
     flag = get_flag()
-
-    # the encrypted flag is 64 bytes, the key is 32 bytes long. so there are two blocks in the AES encryption.
-    # since the mode is ECB, i only need to decrypt the first block
-    # and meaningful plaintext will appear (if the key is right)
-    flag = flag[0:32]
-
-    print("flag: {}".format(flag))
 
     with open("words.txt") as f:
 
