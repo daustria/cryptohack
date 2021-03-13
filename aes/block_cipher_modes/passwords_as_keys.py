@@ -11,15 +11,27 @@ def decrypt(ciphertext, password_hash):
     r = requests.get('http://aes.cryptohack.org/passwords_as_keys/decrypt/' + ciphertext + '/' + password_hash)
     return r.json()['plaintext']
 
+def decrypt_offline(ciphertext, password_hash):
+    ciphertext = bytes.fromhex(ciphertext)
+    key = bytes.fromhex(password_hash)
+
+    cipher = AES.new(key, AES.MODE_ECB)
+    try:
+        decrypted = cipher.decrypt(ciphertext)
+    except ValueError as e:
+        return {"error": str(e)}
+
+    return decrypted
+
+
 if __name__ == '__main__':
 
-    # the user is MD5 hashing a random word from word.txt
-    # the length of words.txt is small enough for a brute force attack
-
-    #edit: nevermind, brute forcing takes too long...
 
     flag = get_flag()
-    # this way i only do one AES encryption
+
+    # the encrypted flag is 64 bytes, the key is 32 bytes long. so there are two blocks in the AES encryption.
+    # since the mode is ECB, i only need to decrypt the first block
+    # and meaningful plaintext will appear (if the key is right)
     flag = flag[0:32]
 
     print("flag: {}".format(flag))
@@ -35,17 +47,9 @@ if __name__ == '__main__':
 
             word = word.strip()
 
-            # checking the words that only end in 's cut my search in half 
-            if word[-2:] != "'s":
-                continue
-
-
             possible_key = hashlib.md5(word.encode()).digest().hex()
 
-            plaintext = decrypt(flag, possible_key)
-
-            plaintext = bytes.fromhex(plaintext)
-
+            plaintext = decrypt_offline(flag, possible_key)
             print(plaintext)
 
             if plaintext[:6] == b'crypto':
