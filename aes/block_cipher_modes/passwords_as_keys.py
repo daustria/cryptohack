@@ -1,5 +1,7 @@
 import requests
 import hashlib 
+from Crypto.Cipher import AES
+
 
 def get_flag():
     r = requests.get('http://aes.cryptohack.org/passwords_as_keys/encrypt_flag/')
@@ -17,6 +19,8 @@ if __name__ == '__main__':
     #edit: nevermind, brute forcing takes too long...
 
     flag = get_flag()
+    # this way i only do one AES encryption
+    flag = flag[0:32]
 
     print("flag: {}".format(flag))
 
@@ -30,6 +34,11 @@ if __name__ == '__main__':
                 break
 
             word = word.strip()
+
+            # checking the words that only end in 's cut my search in half 
+            if word[-2:] != "'s":
+                continue
+
 
             possible_key = hashlib.md5(word.encode()).digest().hex()
 
