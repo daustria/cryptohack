@@ -2,8 +2,6 @@ import sys
 import requests
 import hashlib
 
-from Crypto.Cipher import AES
-
 # This file is copied over from the one deciphering only the first block of ciphertext.
 # From running the first file, I know that the ciphertext of the first block is :
 # 63727970746f7b70336e3675316e355f
@@ -41,7 +39,6 @@ if __name__ == "__main__":
         if(j != 0):
             padding = initial_padding[:-(2*j)]
 
-        known_plaintext = ""
         # this goes out of bounds on round j = 15, which is okay since it just becomes empty
         known_plaintext = plaintext_0[2*(j+1):]
 

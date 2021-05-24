@@ -2,8 +2,6 @@ import sys
 import requests
 import hashlib
 
-from Crypto.Cipher import AES
-
 
 def encrypt_padding(padding):
     r = requests.get('http://aes.cryptohack.org/ecb_oracle/encrypt/' + padding + '/')
