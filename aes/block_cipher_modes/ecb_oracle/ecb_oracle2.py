@@ -4,19 +4,28 @@ import hashlib
 
 from Crypto.Cipher import AES
 
+# This file is copied over from the one deciphering only the first block of ciphertext.
+# From running the first file, I know that the ciphertext of the first block is :
+# 63727970746f7b70336e3675316e355f
+# crypto{p3n6u1n5_
+
+# We modify the code slightly, so that it deciphers the second block of ciphertext
 
 def encrypt_padding(padding):
     r = requests.get('http://aes.cryptohack.org/ecb_oracle/encrypt/' + padding + '/')
     ciphertext = r.json()['ciphertext']
-    return ciphertext # returns as hex
-    
+    return ciphertext # returns as hex    
+
 if __name__ == "__main__":
 
-    # The 15 bytes to pad the plaintext initially (its just the hex for 'a...a' with 15 a's)
+    # The plaintext of the first block
+    plaintext_0 = "63727970746f7b70336e3675316e355f"
+
+    # The 15 bytes to pad the plaintext initially
     initial_padding = "616161616161616161616161616161" 
 
     # The block of the ciphertext corresponding to the unpadded section.
-    unpadded_ciphertext = encrypt_padding(initial_padding + "61")[32:64]
+    unpadded_ciphertext = encrypt_padding(initial_padding + "61")[64:96]
 
     # The bytes of the unpadded plaintext known so far
     known_bytes = ""
@@ -32,16 +41,21 @@ if __name__ == "__main__":
         if(j != 0):
             padding = initial_padding[:-(2*j)]
 
-        print("prepend is %s \n" % (padding + known_bytes))
+        known_plaintext = ""
+        # this goes out of bounds on round j = 15, which is okay since it just becomes empty
+        known_plaintext = plaintext_0[2*(j+1):]
+
+        print("padding by %d bytes\n" % (len(padding) / 2))
+        print("known plaintext of the second block, after padding, is : %s\n" % (known_plaintext + known_bytes))
 
         ciphertext = ""
 
         if(padding == ""):
             ciphertext = unpadded_ciphertext
         else:
-            ciphertext = encrypt_padding(padding)[0:32]
+            ciphertext = encrypt_padding(padding)[32:64]
 
-        print("ciphertext is %s\n" % ciphertext)
+        print("padded ciphertext is %s\n" % ciphertext)
 
         # The last byte of this 16-byte ciphertext has only one unknown byte in the corresponding
         # plaintext. Namely, the last one.
@@ -54,12 +68,14 @@ if __name__ == "__main__":
         for i in range(0, 255):
 
             last_byte = bytes([i]).hex()
+            
+
+            candidate_plaintext = known_plaintext + known_bytes + last_byte
+
+            out = encrypt_padding(candidate_plaintext)[0:32]
+
     
-            candidate_plaintext = padding + known_bytes + last_byte
-    
-            out = encrypt_padding(candidate_plaintext)
-    
-            if(out[:32] == ciphertext):
+            if(out == ciphertext):
 
                 found_byte = 1
 
