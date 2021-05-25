@@ -7,6 +7,9 @@ import hashlib
 # 63727970746f7b70336e3675316e355f
 # crypto{p3n6u1n5_
 
+# From running this file, the ciphertext in the second block is :
+# h473_3cb}
+
 # We modify the code slightly, so that it deciphers the second block of ciphertext
 
 def encrypt_padding(padding):
