@@ -1,0 +1,38 @@
+let c_0, c_1, c_2 denote ciphertext blocks
+
+p_0, p_1, p_2 denote plaintext blocks
+
+q_0, q_1, q_2 denote plaintext blocks after decrypting ciphertext with the ECB mode.
+
+
+ciphertext (encrypting with CBC)
+
+87cc2a4822f5bf1cf41865d06db4834b // c0
+89bc47bcdae97e3369acd1c5302a1a6f // c1 
+4756907e4aacced2889fadba683923cf // c2
+
+plaintext after decrypting with ECB
+
+888e79584934186807f77c95ee23b73c // q0
+e4be5338569ac42f977a3ae518d7e87e // q1
+d688318ceb8d21025ef3f0e4110b3b12 // q2
+
+
+c0 = AES(p0 xor IV)
+c1 = AES(p1 xor c0)
+c2 = AES(p2 xor c1)
+
+q0 = p0 xor IV
+q1 = p1 xor c0
+q2 = p2 xor c1
+
+
+q and c are known. just from XORing:
+
+p0 = ??
+p1 = 63727970746f7b3363625f3575636b35
+p2 = 5f34763031645f31375f21212121217d
+
+p1 and p2 correspond to 
+
+crypto{3cb_5uck5_4v01d_17_!!!!!}
