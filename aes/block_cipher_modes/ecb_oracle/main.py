@@ -50,26 +50,27 @@ if __name__ == "__main__":
         print("START ROUND %d =======================================\n" % i) 
         print("padding by %d bytes\n" % (32 - (i + 1)))
         
-        # Assume the ciphertext is only 2 blocks long, so our padding only needs to be 31 bytes
         padding = make_padding(known_bytes)
-        # only get the last two blocks
+        # our approach only cares about the last two 16-byte blocks
         padded_cipher = encrypt_padding(padding)[0:32]
 
         found_last_byte = 0
 
-        # i should be searching in bytes from 0 to 255, but i know the flag is going to only have these bytes
+        # technically, i should be searching in bytes from 0 to 255, 
+        # but i know the flag is going to only have these bytes.
+        # this makes the code run a lot faster.
         for j in 'qwertyuiopasdfghjklzxcvbnm1234567890_{}':
 
             last_byte_candidate = j.encode()
 
             candidate_plaintext = padding + known_bytes + last_byte_candidate
 
-            # only get last 2 blocks
+            # again, we only care about the last two blocks.
             out = encrypt_padding(candidate_plaintext)[0:32]
 
             # compare the first two blocks of each output.
             # if they have matching AES encryptions, then we assume their plaintexts
-            # were the same.
+            # were the same. that is, our guess of the last byte is correct.
             if (out == padded_cipher):
                 found_last_byte = 1
                 print("Success: the unknown byte is %s\n" % last_byte_candidate)
