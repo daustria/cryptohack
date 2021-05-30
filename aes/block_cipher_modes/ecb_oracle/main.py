@@ -1,6 +1,33 @@
 import sys
 import requests
 
+# Here is the main idea of the approach.
+
+# First we pad by 31 bytes. Our plaintext will look like this:
+
+# AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAA- ---------------- ---------------
+
+# From the challenge, we may freely obtain the corresponding ciphertext.
+# Then, for all possible bytes x, we obtain the ciphertext for
+
+# AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAAx ---------------- ---------------
+
+# Then we compare ciphertexts of the first two blocks. If they are the same, 
+# then we may assume the plaintexts were the same (this is because ECB mode is used).
+
+# For the next round, we pad by 30 bytes. Our plaintext will look like this:
+
+# AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAc- ---------------- ---------------
+
+# Where 'c' is the known byte of 'x' in the first round.
+
+# for all possible bytes x, we obtain the ciphertext for 
+
+# AAAAAAAAAAAAAAAA AAAAAAAAAAAAAAcx ---------------- ---------------
+
+# And do the same thing as in the first round.
+# We repeat this at most 32 times, since we assume the ciphertext is at most 2 blocks long.
+
 def encrypt_padding(padding):
     r = requests.get('http://aes.cryptohack.org/ecb_oracle/encrypt/' + padding.hex() + '/')
     ciphertext = r.json()['ciphertext']
@@ -17,6 +44,7 @@ def make_padding(known_bytes):
 if __name__ == "__main__":
 
     known_bytes = ''.encode()
+
     for i in range(0, 32):
 
         print("START ROUND %d =======================================\n" % i) 
@@ -44,19 +72,14 @@ if __name__ == "__main__":
             # were the same.
             if (out == padded_cipher):
                 found_last_byte = 1
-                print("ROUND %d SUCCESS\n" % i)
-                print("The unknown byte is %s\n" % last_byte_candidate)
+                print("Success: the unknown byte is %s\n" % last_byte_candidate)
                 known_bytes = known_bytes + last_byte_candidate
                 break
 
         print("Known plaintext so far is %s\n" % known_bytes)
+        print("END ROUND %d =========================================\n" % i) 
 
         if not found_last_byte:
             print("Did not find the unknown byte this round. Terminating...\n")
             sys.exit(1)
-
-
-
-
-
 
